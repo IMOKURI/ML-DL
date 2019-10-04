@@ -138,6 +138,7 @@ model = Sequential()
 model.add(Conv2D(16, kernel_size=(5, 5), activation='relu',
                  kernel_initializer='he_normal', input_shape=(28, 28, 1)))  # 28x28x1 -> 24x24x16
 model.add(MaxPooling2D(pool_size=(2, 2)))  # 24x24x16 -> 12x12x16
+model.add(BatchNormalization())
 model.add(Conv2D(64, kernel_size=(5, 5), activation='relu',
                  kernel_initializer='he_normal'))  # 12x12x16 -> 8x8x64
 model.add(MaxPooling2D(pool_size=(2, 2)))  # 8x8x64 -> 4x4x64
