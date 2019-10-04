@@ -12,3 +12,4 @@
 ## Contents
 
 - mnist: 手書き数字解析
+- fashion mnist: 洋服の画像分類(CNN)
