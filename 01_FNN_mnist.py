@@ -5,7 +5,7 @@
 
 # # Deep Learning入門
 
-# ## テストデータ
+# ## Feedforward Neural Network(FNN) のサンプル
 
 # <codecell>
 
@@ -53,6 +53,7 @@ y_test = to_categorical(y_test)
 
 # <codecell>
 
+# Sequential: ネットワークを1列に積み上げているシンプルな方法
 model = Sequential()
 
 # 最初のlayerはinput_shapeを指定して、入力するデータの次元を与える必要がある
@@ -71,30 +72,32 @@ model.add(Dense(256, activation='relu'))
 # 訓練データセットから部分訓練データセットを大量に作成し、
 # 各モデルの予測結果を平均する手法をアンサンブルというが、
 # とてつもない計算量を要する
-model.add(Dropout(0.2))
+# model.add(Dropout(0.2))
 
 model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.2))
+# model.add(Dropout(0.2))
 
 # 正規化: L2正則化では、全パラメータの2乗和を正則化項として損失関数に加えます。
 # L2正則化では、パラメータを完全に0にすることは少ないものの、
 # パラメータを滑らかにすることで予測精度のより良いモデルを構築する
-model.add(Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+# model.add(Dense(256, activation='relu', kernel_regularizer=regularizers.l2(0.01)))
 
 # 正規化: L1正則化では、全パラメータの絶対値の和を正則化項として損失関数に加える。
 # L1正則化ではL2正則化よりもパラメータが0になりやすいという特徴（スパース性）がある
-model.add(Dense(256, activation='relu', kernel_regularizer=regularizers.l1(0.01)))
+# model.add(Dense(256, activation='relu', kernel_regularizer=regularizers.l1(0.01)))
 
 # 正規化: L1正則化とL2正則化の組み合わせのElasticNet
-model.add(Dense(100, activation='relu',
-                kernel_regularizer=regularizers.l1_l2(l1=0.01, l2=0.01)))
+# model.add(Dense(100, activation='relu',
+#                 kernel_regularizer=regularizers.l1_l2(l1=0.01, l2=0.01)))
 
 model.add(Dense(units=10))
+# softmax: 他クラス分類の活性化関数として用いられる
 model.add(Activation('softmax'))
 
 model.compile(
     loss='categorical_crossentropy',
     # optimizer='sgd',
+    # 最適化手法として Adam を使用している。
     optimizer=Adam(),
     metrics=['acc']
 )
@@ -117,7 +120,7 @@ SVG(model_to_dot(model, dpi=72).create(prog='dot', format='svg'))
 
 history = model.fit(
     x_train, y_train,
-    batch_size=1000, epochs=20, verbose=1,
+    batch_size=100, epochs=20, verbose=1,
     validation_data=(x_test, y_test),
     # 早期終了: 検証データの誤差が大きくなってきた（或いは評価関数値が下がってきた）ところで学習をストップさせる
     callbacks=[EarlyStopping(patience=0, verbose=1)]
@@ -149,74 +152,4 @@ plt.title('Model loss')
 plt.ylabel('Loss')
 plt.xlabel('Epoch')
 plt.legend(['Train', 'Test'], loc='upper left')
-plt.show()
-
-# <markdowncell>
-
-# ## 活性化関数
-
-# <codecell>
-
-
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
-
-
-def relu(x):
-    return np.maximum(0, x)
-
-
-def tanh(x):
-    return np.tanh(x)
-
-
-fig = plt.figure()
-x = np.linspace(-10, 10, 1000)
-
-ax = fig.add_subplot(111)
-ax.plot(x, sigmoid(x), label='sigmoid')
-ax.plot(x, relu(x), label='ReLU')
-ax.plot(x, tanh(x), label='tanh')
-
-plt.legend()
-plt.xlim(-5, 5)
-plt.ylim(-1.1, 2)
-plt.grid(which='major', color='gray', linestyle='-')
-plt.show()
-
-# <markdowncell>
-
-# ## 活性化関数の微分
-
-# <codecell>
-
-
-def deriv_sigmoid(x):
-    return np.exp(x) / (1 + np.exp(x))**2
-
-
-def deriv_tanh(x):
-    return 1 - np.tanh(x)**2
-
-
-def deriv_relu(x):
-    return 1 * (x > 0)
-
-
-fig = plt.figure()
-x = np.linspace(-10, 10, 1000)
-
-# sigmoid
-ax = fig.add_subplot(111)
-ax.plot(x, deriv_sigmoid(x), label='sigmoid deriv')
-
-# tanh
-ax.plot(x, deriv_tanh(x), label='tanh deriv')
-
-# relu
-ax.plot(x, deriv_relu(x), label='ReLU deriv')
-
-plt.legend()
-plt.xlim(-2, 2)
-plt.ylim(0, 1.2)
 plt.show()
